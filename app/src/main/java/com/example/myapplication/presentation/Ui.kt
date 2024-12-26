@@ -73,40 +73,102 @@ fun BookItem(book: Book) {
 }
 
 @Composable
-fun LoginScreen(viewModel: AuthViewModel) {
+fun LoginScreen(viewModel: AuthViewModel, onLoginSuccess: (Boolean) -> Unit) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var isSuccess by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
 
-    Column {
+    Column(modifier = Modifier.padding(16.dp)) {
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email") }
+            label = { Text("Email") },
+            modifier = Modifier.fillMaxWidth()
         )
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
             label = { Text("Password") },
-            visualTransformation = PasswordVisualTransformation()
+            visualTransformation = PasswordVisualTransformation(),
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
         )
-        Button(onClick = {
-            viewModel.login(email, password) { success, error ->
-                if (success) {
-                    isSuccess = true
-                } else {
-                    errorMessage = error ?: "Unknown error"
+        Button(
+            onClick = {
+                viewModel.login(email, password) { success, error ->
+                    if (success) {
+                        onLoginSuccess(true)
+                    } else {
+                        errorMessage = error ?: "Unknown error"
+                    }
                 }
-            }
-        }) {
+            },
+            modifier = Modifier.padding(top = 16.dp)
+        ) {
             Text("Login")
         }
 
-        if (isSuccess) {
-            Text("Login successful!")
-        } else if (errorMessage.isNotEmpty()) {
-            Text("Error: $errorMessage")
+        if (errorMessage.isNotEmpty()) {
+            Text("Error: $errorMessage", color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 8.dp))
+        }
+
+        Button(
+            onClick = { onLoginSuccess(false) },
+            modifier = Modifier.padding(top = 16.dp)
+        ) {
+            Text("Register")
+        }
+    }
+}
+
+@Composable
+fun RegisterScreen(viewModel: AuthViewModel, onRegisterSuccess: (Boolean) -> Unit) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf("") }
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        OutlinedTextField(
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        OutlinedTextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Password") },
+            visualTransformation = PasswordVisualTransformation(),
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+        )
+        OutlinedTextField(
+            value = confirmPassword,
+            onValueChange = { confirmPassword = it },
+            label = { Text("Confirm Password") },
+            visualTransformation = PasswordVisualTransformation(),
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+        )
+        Button(
+            onClick = {
+                if (password == confirmPassword) {
+                    viewModel.register(email, password) { success, error ->
+                        if (success) {
+                            onRegisterSuccess(true)
+                        } else {
+                            errorMessage = error ?: "Unknown error"
+                        }
+                    }
+                } else {
+                    errorMessage = "Passwords do not match"
+                }
+            },
+            modifier = Modifier.padding(top = 16.dp)
+        ) {
+            Text("Register")
+        }
+
+        if (errorMessage.isNotEmpty()) {
+            Text("Error: $errorMessage", color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 8.dp))
         }
     }
 }

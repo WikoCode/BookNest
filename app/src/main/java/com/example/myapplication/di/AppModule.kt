@@ -8,6 +8,7 @@ import com.example.myapplication.data.OpenLibraryApiService
 import com.example.myapplication.data.BookRepository
 import android.content.Context
 import com.example.myapplication.data.RetrofitInstance
+import com.google.firebase.auth.FirebaseAuth
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -34,4 +35,10 @@ object AppModule {
     @Provides
     fun provideRepository(api: OpenLibraryApiService, dao: BookDao): BookRepository =
         BookRepository(api, dao)
+
+    @Provides
+    @Singleton
+    fun provideFirebaseAuth(): FirebaseAuth {
+        return FirebaseAuth.getInstance()
+    }
 }
